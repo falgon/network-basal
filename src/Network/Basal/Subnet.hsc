@@ -9,6 +9,7 @@ import qualified Network.Socket as NS
 import Control.Exception (bracket)
 import Data.Bool (bool)
 import Data.Bits (shiftL, (.&.))
+import Data.Tuple.Extra (both)
 import Data.Word (Word32)
 import qualified Network.Socket as NS hiding (recv, recvFrom, send, sendTo)
 
@@ -32,4 +33,4 @@ getSubnetMaskFromNIface :: String -> IO (Maybe NS.HostAddress)
 getSubnetMaskFromNIface nic = allocaBytes 4 $ \ptr -> bracket (newCString nic) free $ \cs -> c_get_subnet_from_nic cs ptr >>= bool (return Nothing) (Just . fromIntegral <$> peek ptr) . (==exitsucc)
 
 isin :: NS.HostAddress -> NS.HostAddress -> NS.HostAddress -> Bool
-isin ip1 ip2 smask = (ip1 .&. smask) == (ip2 .&. smask)
+isin ip1 ip2 smask = uncurry (==) $ both (.&. smask) (ip1, ip2)

@@ -8,13 +8,14 @@ This project is not for practical because it was implemented for learning, so th
 
 This includes the implementation below.
 
-* ARP
+* ARP (Implementation in C++ refers to [this repository](https://github.com/falgon/arp_experiment).)
 * ICMP
     * Link Layer (Normally it is not necessary to send from the link layer, but I decided to create all of the Ether header, IP header and ICMP data for learning.)
     * Network Layer
 * Wake-On-Lan
 * Subnet calculation, derivation of default route gateway, etc.
 
+[Here](https://falgon.github.io/roki.log/posts/2018/%209/15/scratchPacket/)'s a post covering the implementation in more detail (Japanese).
 
 ## build
 
@@ -54,10 +55,10 @@ PING 8.8.8.8: 56 data bytes
 
 ### ping-exe2
 
-Builds an Ethernet packet on its own and issues an ICMP Echo request.
+Builds an Ethernet packet on its own and sends an ICMP Echo request.
 
 ```sh
-sudo stack --allow-different-user exec ping-exe2 -- -c 1 8.8.8.8
+$ sudo stack --allow-different-user exec ping-exe2 -- -c 1 8.8.8.8
 PING 8.8.8.8: 56 data bytes
 64 bytes from google-public-dns-a.google.com: icmp_seq=1 ttl=63 time=11.432482s
 

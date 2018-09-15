@@ -34,8 +34,6 @@ findnifaceerr tmod s = tmod (s ++ ".findNIface: failed to find the specified net
 getarperr :: (String -> TT.Assertion -> TT.Test) -> String -> TT.Test
 getarperr tmod s = tmod (s ++ ".getMacAddr: failed to get the MAC address from specified ip address.") TT.fail
 
--- flip testmodule TT.fail . flip (++) ".getMacAddr: failed to get the MAC address from specified ip address."
-
 getdgwerr :: String -> TT.Test
 getdgwerr = flip testmodule TT.fail . 
     flip (++) ".getDGWMacAddr: failed to get the MAC address of the specified default gateway."

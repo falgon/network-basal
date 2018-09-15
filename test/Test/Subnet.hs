@@ -23,12 +23,11 @@ type SrcNIC = String
 type DstIp = String
 
 test2int :: Bool -> SrcNIC -> DstIp -> IO TT.Test
-test2int b src dst = do
-    (>>=) (findNIface src) $ maybe (return $ testmodule "test2 isin: " TT.fail) $ \nic -> do
+test2int b src dst = (>>=) (findNIface src) $ maybe (return $ testmodule "test2 isin: " TT.fail) $ \nic -> do
         target <- host2ipv4 dst
         let (IPv4 ip) = ipv4 nic
             (IPv4 dstip) = target
-        return $ testmodule "test2 isin: " $ maybe TT.fail ((@?=) b . isin ip dstip) =<< (getSubnetMaskFromNIface $ name nic)
+        return $ testmodule "test2 isin: " $ maybe TT.fail ((@?=) b . isin ip dstip) =<< getSubnetMaskFromNIface (name nic)
     
 
 test2 :: SrcNIC -> DstIp -> IO TT.Test

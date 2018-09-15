@@ -109,7 +109,7 @@ getVerIhl :: BS.ByteString -> (Word8, Word8)
 getVerIhl = BG.runGet ((flip shiftR 4 &&& (.&. 0x0f)) <$> BG.getWord8) . BL.fromStrict
 
 instance IpProtocol a => LE.EtherData (Structure a) where
-    fromData p = Structure (({-BG.runGet getHeader-}fromHeader iph) { ipVI = IpVI $ (v `shiftL` 4) .|. i }) (fromIpData (BL.drop optLen ipdWithOpt)) $ BL.take optLen ipdWithOpt -- drop and take the option data.
+    fromData p = Structure ((fromHeader iph) { ipVI = IpVI $ (v `shiftL` 4) .|. i }) (fromIpData (BL.drop optLen ipdWithOpt)) $ BL.take optLen ipdWithOpt -- drop and take the option data.
         where
             defHdrLen = fromIntegral (noOptHeaderLength * 4) :: Int64
             (v, i) = getVerIhl p
