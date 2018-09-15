@@ -1,0 +1,94 @@
+name:                network-basal
+version:             0.1.0.0
+github:              "falgon/basal"
+license:             MIT
+author:              "roki"
+maintainer:          "falgon53@yahoo.co.jp"
+copyright:           "2018 roki"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+synopsis:            Low level Network utilities on Linux
+category:            Network
+
+description:         Please see the README on GitHub at <https://github.com/githubuser/network-basal#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- network
+- binary
+- bytestring
+- time
+- process
+- split
+- extra
+- network-info
+- pcap
+- unix
+
+build-tools:
+- hsc2hs
+
+library:
+  source-dirs: 
+  - src
+  - executables_src
+
+executables:
+  ping-exe:
+    main:               ping/Main.hs
+    source-dirs:        app
+    c-sources:          src/cbits/get_network_subnet.c
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    - -O2
+    dependencies:
+    - network-basal
+  arp-exe:
+    main:               arp/Main.hs
+    source-dirs:        app
+    c-sources:          src/cbits/get_network_subnet.c
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    - -O2
+    dependencies:
+    - network-basal
+  ping-exe2:
+    main:               ping2/Main.hs
+    source-dirs:        app
+    c-sources:          src/cbits/get_network_subnet.c
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -Wall
+    - -Werror
+    - -O2
+    dependencies:
+    - network-basal
+       
+tests:
+  test:
+    main:                Spec.hs
+    source-dirs:
+    - test
+    c-sources:          src/cbits/get_network_subnet.c
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - network-basal
+    - random
+    - HUnit
+    - directory
