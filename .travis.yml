@@ -1,26 +1,27 @@
 sudo: required
+dist: trusty
 language: generic
 cache:
     directories:
         - "$HOME/.stack/"
         - "$HOME/.local/bin/"
         - ".stack-work/"
-apt:
-    update: true
 os:
     - linux
 before_install:
     - mkdir -p ~/.local/bin
     - export PATH=$HOME/.local/bin:$PATH
     - travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-    - sudo apt-get -qq -y -f --no-show-upgraded --autoremove install build-essential g++-7 gcc-7 libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev git gnupg zsh vim vim-gnome hlint arping arp-scan libc6-dev-i386 libpcap-dev
+    - curl -sL https://raw.githubusercontent.com/falgon/SrookCppLibraries/8e7e30275e407ab6d67bddebf898c826b61fa553/travis/linux/before_install.sh | bash
+    - curl -sL https://raw.githubusercontent.com/falgon/SrookCppLibraries/a3b43fe51ed3cc17e9683fdedee27d59517a128e/travis/linux/install.sh | bash
 install:
     - stack --no-terminal test --only-dependencies
 jobs:
-	include:
+    include:
         - stage: Run build
-          script: stack build
+          script: stack build --fast
         - stage: Run Hlint
           script: curl -sL https://raw.github.com/ndmitchell/hlint/master/misc/travis.sh | sh -s .
+
 notifications:
     email: false
