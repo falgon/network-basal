@@ -62,13 +62,11 @@ instance II.IpProtocol Structure where
     fromIpData p = Structure (BG.runGet getHeader icmph) icmpd
         where
             (icmph, icmpd) = BL.splitAt 8 p
-            getHeader = do
-                i <- BG.getWord8
-                code <- BG.getWord8
-                cs <- BG.getWord16be
-                ide <- BG.getWord16be
-                s <- BG.getWord16be
-                return $ Header (toEnum $ fromIntegral i) code cs ide s
+            getHeader = Header <$> (toEnum . fromIntegral <$> BG.getWord8) -- icmp type
+                <*> BG.getWord8 -- code
+                <*> BG.getWord16be -- check sum
+                <*> BG.getWord16be -- ident
+                <*> BG.getWord16be -- seq
     checkProtoReply st = c == 0 || c == 0xffff
         where
             c = II.checksum (II.pack st)

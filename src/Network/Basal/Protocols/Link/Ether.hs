@@ -145,14 +145,9 @@ recvFrom p = fix $ \f -> do
     if checkReply st then return (hdr, Structure (ethHeader eth) st) else f
 
 fromHeader :: Packet -> Header
-fromHeader p = BG.runGet f $ BL.fromStrict p 
+fromHeader = BG.runGet (Header <$> readHost <*> readHost <*> (toEnum . fromIntegral <$> BG.getWord16be)) . BL.fromStrict
     where
-        f = do
-            let readHost = replicateM (fromIntegral ethAlen) BG.getWord8
-            etherDhost <- readHost
-            etherShost <- readHost
-            etherType <- BG.getWord16be
-            return $ Header etherDhost etherShost $ toEnum $ fromIntegral etherType
+        readHost = replicateM (fromIntegral ethAlen) BG.getWord8
 
 fromPacket :: Packet -> Structure EtherPacket
 fromPacket p = Structure (fromHeader eth) etd

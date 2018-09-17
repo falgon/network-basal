@@ -79,20 +79,16 @@ instance Show Header where
         ", ipDaddr = " ++ show (NI.IPv4 daddr) ++ "}"
 
 fromHeader :: BL.ByteString -> Header
-fromHeader = BG.runGet f
-    where
-        f = do
-            ipvi <- BG.getWord8 
-            tos <- BG.getWord8
-            tot <- BG.getWord16be
-            id' <- BG.getWord16be
-            foff <- BG.getWord16be
-            ttl <- BG.getWord8
-            pa <- BG.getWord8
-            c <- BG.getWord16be
-            sa <- BG.getWord32le
-            da <- BG.getWord32le
-            return $ Header (IpVI ipvi) tos tot id' foff ttl (toEnum $ fromIntegral pa) c sa da
+fromHeader = BG.runGet $ Header <$> (IpVI <$> BG.getWord8) -- version and Ihl
+    <*> BG.getWord8 -- tos
+    <*> BG.getWord16be -- totlen
+    <*> BG.getWord16be -- id
+    <*> BG.getWord16be -- frag off
+    <*> BG.getWord8 -- ttl
+    <*> (toEnum . fromIntegral <$> BG.getWord8) -- protocol number 
+    <*> BG.getWord16be -- check sum
+    <*> BG.getWord32le -- source addr
+    <*> BG.getWord32le -- destination addr
 
 class IpProtocol a where
     fromIpData :: BL.ByteString -> a
@@ -152,19 +148,16 @@ ipHeader proto ni daddr = packData $ g $ checksum $ packData $ g 0
             ipSaddr = saddr,
             ipDaddr = daddr
         }
-        packData = BP.runPut . f
-            where
-                f :: Header -> BP.Put
-                f (Header (IpVI vh) tos tot id' foff ttl pa c sa da) = BP.putWord8 vh *>
-                    BP.putWord8 tos                 *>
-                    BP.putWord16be tot              *>
-                    BP.putWord16be id'              *>
-                    BP.putWord16be foff             *>
-                    BP.putWord8 ttl                 *>
-                    BP.putWord8 (LE.paramVal pa)    *>
-                    BP.putWord16be c                *>
-                    BP.putWord32le sa               *>
-                    BP.putWord32le da
+        packData = (.) BP.runPut $ \(Header (IpVI vh) tos tot id' foff ttl pa c sa da) -> BP.putWord8 vh *>
+            BP.putWord8 tos                 *>
+            BP.putWord16be tot              *>
+            BP.putWord16be id'              *>
+            BP.putWord16be foff             *>
+            BP.putWord8 ttl                 *>
+            BP.putWord8 (LE.paramVal pa)    *>
+            BP.putWord16be c                *>
+            BP.putWord32le sa               *>
+            BP.putWord32le da
 
 -- | Lookup from /proc/net/route, it looks like this:
 -- Iface   Destination     Gateway         Flags   RefCnt  Use     Metric  Mask            MTU     Window  IRTT               

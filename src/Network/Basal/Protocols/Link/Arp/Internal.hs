@@ -8,6 +8,7 @@ Stability   : experimental
 Portability : POSIX
 -}
 {-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE TupleSections #-}
 
 module Network.Basal.Protocols.Link.Arp.Internal (
     socket,
@@ -76,24 +77,23 @@ instance Show Structure where
         ", arpTargetIp = " ++ concat (f ti) ++
         "}"
         where
-            f = unfoldr (\(x, i) -> if x /= 0 then Just (g x i, (x `shiftR` 8, succ i)) else Nothing) . flip (,) (0 :: Int)
+            f = unfoldr (\(x, i) -> if x /= 0 then Just (g x i, (x `shiftR` 8, succ i)) else Nothing) . (, 0 :: Int)
             g = flip (.) (bool [] "." . (/=3)) . (++) . show . (.&.) 0x000000ff
 
 instance LE.EtherData Structure where
     fromData = BG.runGet f . BL.fromStrict
         where
             f :: BG.Get Structure
-            f = do
-                arphrd <- BG.getWord16be
-                arppro <- BG.getWord16be
-                arphln <- BG.getWord8
-                arppln <- BG.getWord8
-                arpop <- BG.getWord16be
-                sendermac <- replicateM 6 BG.getWord8 
-                senderip <- BG.getWord32le
-                targetmac <- replicateM 6 BG.getWord8
-                targetip <- BG.getWord32le
-                return $ Structure (Header (toEnum $ fromIntegral arphrd) (toEnum $ fromIntegral arppro) arphln arppln (toEnum $ fromIntegral arpop)) sendermac senderip targetmac targetip
+            f = Structure <$>
+                    (Header <$> (toEnum . fromIntegral <$> BG.getWord16be) -- hardware type
+                        <*> (toEnum . fromIntegral <$> BG.getWord16be) -- protocol
+                        <*> BG.getWord8 -- hln
+                        <*> BG.getWord8 -- pln
+                        <*> (toEnum . fromIntegral <$> BG.getWord16be)) -- operation code
+                    <*> replicateM 6 BG.getWord8 -- sender mac addr
+                    <*> BG.getWord32le -- sender ip
+                    <*> replicateM 6 BG.getWord8 -- target mac addr
+                    <*> BG.getWord32le -- target ip
     checkReply = (OpcRep==) . arpOp . arpH
 
 -- | socket for ARP

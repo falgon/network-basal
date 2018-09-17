@@ -31,7 +31,7 @@ addDelim :: String -> Int -> [String] -> String
 addDelim dot n = concat . zipWith (\i x -> if n /= i then x ++ dot else x) [1..n]
 
 randomMac :: IO String
-randomMac = addDelim ":" 6 <$> replicateM 6 ((uncurry id . first (\x -> bool x ('0':x)) . second ((==1) . length) . dupe . int2Hex) <$> (randomRIO (0, 255) :: IO Int))
+randomMac = addDelim ":" 6 <$> replicateM 6 (uncurry id . first (\x -> bool x ('0':x)) . second ((==1) . length) . dupe . int2Hex <$> (randomRIO (0, 255) :: IO Int))
 
 randomIp :: IO String
 randomIp = (randomRIO (0, 2) :: IO Int) >>= rndip
