@@ -8,7 +8,7 @@ ENVUSER=vagrant
 USERHOME=/home/$ENVUSER
 
 $APT -y -f --no-show-upgraded purge haskell-stack
-$APT -y -f --no-show-upgraded --autoremove install build-essential g++ gcc libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev git gnupg zsh vim vim-gnome hlint arping arp-scan libc6-dev-i386 libpcap-dev > /dev/null
+$APT -y -f --no-show-upgraded --autoremove install build-essential g++-7 gcc-7 libc6-dev libffi-dev libgmp-dev make xz-utils zlib1g-dev git gnupg zsh vim vim-gnome hlint arping arp-scan libc6-dev-i386 libpcap-dev > /dev/null
 which stack > /dev/null
 RS=$?
 if [ $RS = 1 ]; then
