@@ -1,5 +1,6 @@
 # network-basal
 
+[![Build Status](https://travis-ci.org/falgon/network-basal.svg?branch=master)](https://travis-ci.org/falgon/network-basal)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/80780d7eaab14e6eb3e6134bf53e77ca)](https://www.codacy.com/app/falgon/network-basal_2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=falgon/network-basal&amp;utm_campaign=Badge_Grade)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
