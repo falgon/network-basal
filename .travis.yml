@@ -2,6 +2,7 @@ sudo: required
 dist: trusty
 language: generic
 cache:
+    apt: true
     directories:
         - "$HOME/.stack/"
         - "$HOME/.local/bin/"
