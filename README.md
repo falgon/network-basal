@@ -16,7 +16,7 @@ This includes the implementation below.
 * Wake-On-Lan
 * Subnet calculation, derivation of default route gateway, etc.
 
-[Here](https://falgon.github.io/roki.log/posts/2018/%209/15/scratchPacket/)'s a post covering the implementation in more detail (Japanese).
+[Here](https://falgon.github.io/roki.log/posts/2018/%209月/15/scratchPacket/)'s a post covering the implementation in more detail (Japanese).
 
 ## build
 
