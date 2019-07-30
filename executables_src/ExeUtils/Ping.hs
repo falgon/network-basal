@@ -43,7 +43,7 @@ version :: IO ()
 version = getProgName >>= putStrLn . flip (++) " version 1.0.0"
 
 findNextDigitable :: String -> [String] -> Maybe ([String], [String])
-findNextDigitable x ls = maybe Nothing (\i -> if succ i < length ls && isDigit' (ls !! succ i) then Just (take 2 (drop i ls), take i ls ++ drop (i + 2) ls) else Nothing) $ elemIndex x ls
+findNextDigitable x ls = (\i -> if succ i < length ls && isDigit' (ls !! succ i) then Just (take 2 (drop i ls), take i ls ++ drop (i + 2) ls) else Nothing) =<< elemIndex x ls
     where
         isDigit' = null . dropWhile isDigit
 

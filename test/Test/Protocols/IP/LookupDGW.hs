@@ -20,4 +20,4 @@ test2 = do
     proc <- find ((=="default") . head) . map words . lines <$> readProcess "ip" ["r"] []
     return $ "Test.Protocols.IP.LookupDGW.test2" ~: case proc of
         Nothing -> True @?= False
-        Just x -> lookupDGW >>= maybe (True @?= False) ((@?=x !! 2) . show) . fmap IPv4
+        Just x -> lookupDGW >>= maybe (True @?= False) (((@?=x !! 2) . show) . IPv4)
