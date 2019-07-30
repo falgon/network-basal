@@ -9,9 +9,9 @@ This project is not for practical because it was implemented for learning, so th
 
 This includes the implementation below.
 
-* ARP (Implementation in C++ refers to [this repository](https://github.com/falgon/arp_experiment).)
+* ARP (Implementation in C++ refers to [this repository](https://github.com/falgon/arp_experiment))
 * ICMP
-    * Link Layer (Normally it is not necessary to send from the link layer, but I decided to create all of the Ether header, IP header and ICMP data for learning.)
+    * Link Layer (From Ethernet frame. Normally it is not necessary to send from the link layer, but I decided to create all of the Ether header, IP header and ICMP data for learning.)
     * Network Layer
 * Wake-On-Lan
 * Subnet calculation, derivation of default route gateway, etc.
