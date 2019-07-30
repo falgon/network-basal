@@ -11,7 +11,7 @@ This includes the implementation below.
 
 * ARP (Implementation in C++ refers to [this repository](https://github.com/falgon/arp_experiment))
 * ICMP
-    * Link Layer (From Ethernet frame. Normally it is not necessary to send from the link layer, but I decided to create all of the Ether header, IP header and ICMP data for learning.)
+    * Link Layer (From Ethernet frame. Normally it is not necessary to send from the link layer, but I decided to create all of the Ether header, IP header and ICMP data for learning)
     * Network Layer
 * Wake-On-Lan
 * Subnet calculation, derivation of default route gateway, etc.
@@ -32,7 +32,7 @@ This project has been tested and passed in the vagrant environment in the [teste
 $ git clone https://github.com/falgon/network-basal.git
 $ mv network-basal/testenv . && mv network-basal testenv && cd testenv
 $ vagrant up
-$ vagrant ssh -c 'sudo stack test --allow-different-user --stack-yaml /vagrant/network-basal/stack.yaml' node1
+$ vagrant ssh -c 'sudo stack --allow-different-user --stack-yaml /vagrant/network-basal/stack.yaml --stack-root /vagrant test' node1
 ```
 
 ## run apps
