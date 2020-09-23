@@ -12,6 +12,7 @@ os:
 before_install:
     - mkdir -p ~/.local/bin
     - export PATH=$HOME/.local/bin:$PATH
+    - sudo apt-get purge -y google-chrome-stable
     - travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
     - curl -sL https://raw.githubusercontent.com/falgon/SrookCppLibraries/8e7e30275e407ab6d67bddebf898c826b61fa553/travis/linux/before_install.sh | bash
     - wget --no-check-certificate https://raw.githubusercontent.com/falgon/SrookCppLibraries/a3b43fe51ed3cc17e9683fdedee27d59517a128e/travis/linux/install.sh 
