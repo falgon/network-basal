@@ -13,28 +13,35 @@ module Network.Basal.Protocols.IP.Internal (
     getDGWMacAddr
 ) where
 
-import qualified Network.Basal.Protocols.Link.Ether as LE
-import qualified Network.Basal.Tools.Arp as ARP
-import qualified Network.Basal.Protocols.Utils as PU
-import Network.Basal.Protocols.IP.Identifiers
+import           Network.Basal.Protocols.IP.Identifiers
+import qualified Network.Basal.Protocols.Link.Ether     as LE
+import qualified Network.Basal.Protocols.Utils          as PU
+import qualified Network.Basal.Tools.Arp                as ARP
 
-import Control.Applicative ((<|>))
-import Control.Monad.Fix (fix)
-import qualified Data.Binary.Get as BG
-import qualified Data.Binary.Put as BP
-import Data.Bits (shiftL, shiftR, complement, (.&.), (.|.))
-import Data.Bool (bool)
-import qualified Data.ByteString.Lazy as BL (length, snoc, ByteString, fromStrict, splitAt, take, drop)
-import qualified Data.ByteString as BS
-import Data.List (foldl')
-import Data.List.Split (chunksOf)
-import Data.Int (Int64)
-import Data.Maybe (maybe)
-import Data.Tuple.Extra (first, second, (&&&))
-import Data.Word (Word8, Word16, Word32)
-import qualified Network.Socket as NS hiding (send, sendTo, recv, recvFrom)
-import qualified Network.Info as NI
-import System.IO (withFile, hGetLine, hIsEOF, IOMode (..))
+import           Control.Applicative                    ((<|>))
+import           Control.Monad.Fix                      (fix)
+import qualified Data.Binary.Get                        as BG
+import qualified Data.Binary.Put                        as BP
+import           Data.Bits                              (complement, shiftL,
+                                                         shiftR, (.&.), (.|.))
+import           Data.Bool                              (bool)
+import qualified Data.ByteString                        as BS
+import qualified Data.ByteString.Lazy                   as BL (ByteString, drop,
+                                                               fromStrict,
+                                                               length, snoc,
+                                                               splitAt, take)
+import           Data.Int                               (Int64)
+import           Data.List                              (foldl')
+import           Data.List.Split                        (chunksOf)
+import           Data.Maybe                             (maybe)
+import           Data.Tuple.Extra                       (first, second, (&&&))
+import           Data.Word                              (Word16, Word32, Word8)
+import qualified Network.Info                           as NI
+import qualified Network.Socket                         as NS hiding (recv,
+                                                               recvFrom, send,
+                                                               sendTo)
+import           System.IO                              (IOMode (..), hGetLine,
+                                                         hIsEOF, withFile)
 
 newtype IpVI = IpVI Word8 deriving (Eq, Ord, Bounded, Read)
 
@@ -43,7 +50,7 @@ instance Show IpVI where
 
 {-# INLINE ver #-}
 ver :: IpVI -> Word8
-ver (IpVI d) = d `shiftR` 4 
+ver (IpVI d) = d `shiftR` 4
 
 {-# INLINE ihl #-}
 ihl :: IpVI -> Word8
@@ -54,17 +61,17 @@ verihl :: IpVI -> (Word8, Word8)
 verihl = ver &&& ihl
 
 data Header = Header {
-    ipVI :: IpVI, -- version and Ihl.
-    ipTos :: Word8,
-    ipTotLen :: Word16,
-    ipId :: Word16,
-    ipFragOff :: Word16,
-    ipTtl :: Word8,
+    ipVI       :: IpVI, -- version and Ihl.
+    ipTos      :: Word8,
+    ipTotLen   :: Word16,
+    ipId       :: Word16,
+    ipFragOff  :: Word16,
+    ipTtl      :: Word8,
     ipProtocol :: ProtocolNum,
-    ipCheck :: Word16,
-    ipSaddr :: Word32,
-    ipDaddr :: Word32
-} 
+    ipCheck    :: Word16,
+    ipSaddr    :: Word32,
+    ipDaddr    :: Word32
+}
 
 instance Show Header where
     show (Header vi tos tot id' foff ttl pro chk saddr daddr) = "Header {ipVI = " ++ show vi ++
@@ -74,7 +81,7 @@ instance Show Header where
         ", ipFragOff = " ++ show foff ++
         ", ipTtl = " ++ show ttl ++
         ", ipProtocol = " ++ show pro ++
-        ", ipCheck = " ++ show (PU.int2Hex chk) ++ 
+        ", ipCheck = " ++ show (PU.int2Hex chk) ++
         ", ipSaddr = " ++ show (NI.IPv4 saddr) ++
         ", ipDaddr = " ++ show (NI.IPv4 daddr) ++ "}"
 
@@ -85,19 +92,19 @@ fromHeader = BG.runGet $ Header <$> (IpVI <$> BG.getWord8) -- version and Ihl
     <*> BG.getWord16be -- id
     <*> BG.getWord16be -- frag off
     <*> BG.getWord8 -- ttl
-    <*> (toEnum . fromIntegral <$> BG.getWord8) -- protocol number 
+    <*> (toEnum . fromIntegral <$> BG.getWord8) -- protocol number
     <*> BG.getWord16be -- check sum
     <*> BG.getWord32le -- source addr
     <*> BG.getWord32le -- destination addr
 
 class IpProtocol a where
     fromIpData :: BL.ByteString -> a
-    pack :: a -> BL.ByteString 
+    pack :: a -> BL.ByteString
     checkProtoReply :: a -> Bool
 
 data Structure a = Structure {
-    ipH :: Header,
-    ipData :: a,
+    ipH      :: Header,
+    ipData   :: a,
     ipOption :: BL.ByteString
 } deriving Show
 
@@ -117,7 +124,7 @@ instance IpProtocol a => LE.EtherData (Structure a) where
             r = if BL.length (ipOption st) == 0 then checksum pkd else checksum $ ipOption st <> pkd
 
 data IpProtocolInfo = IpProtocolInfo {
-    len :: Word16,
+    len  :: Word16,
     pnum :: ProtocolNum
 }
 
@@ -136,7 +143,7 @@ ipHeader :: IpProtocolInfo -> NI.NetworkInterface -> NS.HostAddress -> BL.ByteSt
 ipHeader proto ni daddr = packData $ g $ checksum $ packData $ g 0
     where
         (NI.IPv4 saddr) = NI.ipv4 ni
-        g c = Header { 
+        g c = Header {
             ipVI = IpVI $ (4 `shiftL` 4) .|. noOptHeaderLength,
             ipTos = 0,
             ipTotLen = len proto + 64,
@@ -160,21 +167,21 @@ ipHeader proto ni daddr = packData $ g $ checksum $ packData $ g 0
             BP.putWord32le da
 
 -- | Lookup from /proc/net/route, it looks like this:
--- Iface   Destination     Gateway         Flags   RefCnt  Use     Metric  Mask            MTU     Window  IRTT               
--- eth0    00000000        0202000A        0003    0       0       100     00000000        0       0       0                  
--- eth0    0002000A        00000000        0001    0       0       0       00FFFFFF        0       0       0 
+-- Iface   Destination     Gateway         Flags   RefCnt  Use     Metric  Mask            MTU     Window  IRTT
+-- eth0    00000000        0202000A        0003    0       0       100     00000000        0       0       0
+-- eth0    0002000A        00000000        0001    0       0       0       00FFFFFF        0       0       0
 lookupDGW :: IO (Maybe NS.HostAddress)
 lookupDGW = withFile "/proc/net/route" ReadMode $ \h -> fix $ \f -> do
     iseof <- hIsEOF h
     if iseof then return Nothing
     else do
         l <- words <$> hGetLine h
-        if length l > 10 && l !! 1 == "00000000" then return $ l2i (foldl' (flip (.) (fromIntegral . PU.hex2Int) . flip (:)) [] $ chunksOf 2 (l !! 2)) <|> Nothing 
+        if length l > 10 && l !! 1 == "00000000" then return $ l2i (foldl' (flip (.) (fromIntegral . PU.hex2Int) . flip (:)) [] $ chunksOf 2 (l !! 2)) <|> Nothing
         else f
             where
                 l2i [i,p,a,d] = Just $ NS.tupleToHostAddress (i, p, a, d)
-                l2i _ = Nothing
+                l2i _         = Nothing
 
 -- | Get Default gateway's MAC address by cache or ARP request.
 getDGWMacAddr :: NI.NetworkInterface -> Int64 -> IO (Maybe NI.MAC)
-getDGWMacAddr nic timeout = maybe (return Nothing) (flip (ARP.getMacAddr nic) timeout . NS.SockAddrInet 0) =<< lookupDGW 
+getDGWMacAddr nic timeout = maybe (return Nothing) (flip (ARP.getMacAddr nic) timeout . NS.SockAddrInet 0) =<< lookupDGW

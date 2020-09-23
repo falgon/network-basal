@@ -1,6 +1,6 @@
 {-|
 Module      : Network.Basal.Protocols.Link.Arp.Internal
-Description : Utilities of the arp packet. 
+Description : Utilities of the arp packet.
 Copyright   : (C) Roki, 2018
 License     : MIT
 Maintainer  : falgon53@yahoo.co.jp
@@ -27,53 +27,68 @@ module Network.Basal.Protocols.Link.Arp.Internal (
     lookupArpTable
 ) where
 
-import qualified Network.Basal.Protocols.Utils as PU
-import Network.Basal.Protocols.Link.Arp.Parameters
-import qualified Network.Basal.Protocols.Link.Ether as LE
-import Network.Basal.Protocols.Utils (findNIface, getDefaultNIface, hex2Int, host2addr)
+import           Network.Basal.Protocols.Link.Arp.Parameters
+import qualified Network.Basal.Protocols.Link.Ether          as LE
+import           Network.Basal.Protocols.Utils               (findNIface,
+                                                              getDefaultNIface,
+                                                              hex2Int,
+                                                              host2addr)
+import qualified Network.Basal.Protocols.Utils               as PU
 
-import Control.Applicative ((<|>))
-import Control.Monad (mapM_, replicateM, replicateM_, (>=>), liftM2)
-import Control.Monad.Fix (fix)
-import Data.Bits (finiteBitSize, (.&.), shiftR)
-import Data.Bool (bool)
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BL
-import Data.Word (Word8, Word32)
-import qualified Data.Binary.Get as BG
-import qualified Data.Binary.Put as BP
-import Data.List (unfoldr)
-import Data.List.Split (wordsBy)
-import Data.Tuple.Extra (second, dupe)
-import Data.Int (Int64)
-import Data.Monoid ((<>))
-import System.IO (withFile, IOMode (..), hIsEOF, hGetLine)
-import qualified Network.Socket as NS
-import qualified Network.Info as NI (ipv4, mac, MAC (..), NetworkInterface, IPv4 (..), name)
-import Network.Pcap (openLive, setFilter, PcapHandle)
+import           Control.Applicative                         ((<|>))
+import           Control.Monad                               (liftM2, mapM_,
+                                                              replicateM,
+                                                              replicateM_,
+                                                              (>=>))
+import           Control.Monad.Fix                           (fix)
+import qualified Data.Binary.Get                             as BG
+import qualified Data.Binary.Put                             as BP
+import           Data.Bits                                   (finiteBitSize,
+                                                              shiftR, (.&.))
+import           Data.Bool                                   (bool)
+import qualified Data.ByteString                             as BS
+import qualified Data.ByteString.Lazy                        as BL
+import           Data.Int                                    (Int64)
+import           Data.List                                   (unfoldr)
+import           Data.List.Split                             (wordsBy)
+import           Data.Monoid                                 ((<>))
+import           Data.Tuple.Extra                            (dupe, second)
+import           Data.Word                                   (Word32, Word8)
+import qualified Network.Info                                as NI (IPv4 (..),
+                                                                    MAC (..),
+                                                                    NetworkInterface,
+                                                                    ipv4, mac,
+                                                                    name)
+import           Network.Pcap                                (PcapHandle,
+                                                              openLive,
+                                                              setFilter)
+import qualified Network.Socket                              as NS
+import           System.IO                                   (IOMode (..),
+                                                              hGetLine, hIsEOF,
+                                                              withFile)
 
 data Header = Header {
     arpHrd :: HardwareType,
     arpPro :: LE.EtherType,
     arpHln :: Word8,
     arpPln :: Word8,
-    arpOp :: OperationCode
+    arpOp  :: OperationCode
 } deriving Show
 
 
 data Structure = Structure {
-    arpH :: Header,
+    arpH         :: Header,
     arpSenderMac :: [Word8],
-    arpSenderIp :: Word32,
+    arpSenderIp  :: Word32,
     arpTargetMac :: [Word8],
-    arpTargetIp :: Word32
+    arpTargetIp  :: Word32
 }
 
 instance Show Structure where
-    show (Structure h sm si tm ti) = "Structure {arpH = " ++ show h ++ 
-        ", arpSenderMac = " ++ show sm ++ 
-        ", arpSenderIp = " ++ concat (f si) ++ 
-        ", arpTargetMac = " ++ show tm ++ 
+    show (Structure h sm si tm ti) = "Structure {arpH = " ++ show h ++
+        ", arpSenderMac = " ++ show sm ++
+        ", arpSenderIp = " ++ concat (f si) ++
+        ", arpTargetMac = " ++ show tm ++
         ", arpTargetIp = " ++ concat (f ti) ++
         "}"
         where

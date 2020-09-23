@@ -15,10 +15,11 @@ module Network.Basal.Protocols.Link.Arp.Parameters (
 ) where
 
 import qualified Network.Basal.Protocols.Link.Ether as LE
-import Network.Basal.Protocols.Utils (succError, predError, toEnumError, int2Hex)
+import           Network.Basal.Protocols.Utils      (int2Hex, predError,
+                                                     succError, toEnumError)
 
-import Data.Tuple (swap)
-import Data.Maybe (fromMaybe, fromJust)
+import           Data.Maybe                         (fromJust, fromMaybe)
+import           Data.Tuple                         (swap)
 
 data OperationCode =
     OpcResv0        | -- RFC 5494
@@ -76,7 +77,7 @@ data HardwareType =
     HrdtHDLC            |
     HrdtFibreChan       | -- RJC 4338
     HrdtATM19           | -- RFC 2225
-    HrdtSerialLine      | 
+    HrdtSerialLine      |
     HrdtATM21           |
     HrdtMILSTD          |
     HrdtMetricom        |
@@ -151,13 +152,13 @@ instance Enum HardwareType where
     succ HrdtHwExp2 = HrdtAEthernet
     succ HrdtAEthernet = HrdtResv1
     succ x | x /= maxBound = toEnum $ fromEnum x + 1 | otherwise = succError "HardwareType"
-    
+
     pred HrdtResv1 = HrdtAEthernet
     pred HrdtAEthernet = HrdtHwExp2
     pred HrdtHwExp2 = HrdtHFI
-    pred x | x /= minBound = toEnum $ fromEnum x - 1 | otherwise = predError "HardwareType" 
-    
+    pred x | x /= minBound = toEnum $ fromEnum x - 1 | otherwise = predError "HardwareType"
+
     fromEnum = fromJust . flip lookup table
     toEnum i = fromMaybe (toEnumError "HardwareType" i (minBound :: HardwareType, maxBound :: HardwareType)) $ lookup i (map swap table)
 
-instance LE.Parameter HardwareType 
+instance LE.Parameter HardwareType

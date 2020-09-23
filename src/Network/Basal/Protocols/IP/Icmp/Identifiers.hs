@@ -3,11 +3,12 @@ module Network.Basal.Protocols.IP.Icmp.Identifiers (
     IcmpType (..)
 ) where
 
-import Network.Basal.Protocols.Link.Ether (Parameter)
-import Network.Basal.Protocols.Utils (succError, predError, int2Hex)
+import           Network.Basal.Protocols.Link.Ether (Parameter)
+import           Network.Basal.Protocols.Utils      (int2Hex, predError,
+                                                     succError)
 
-import Data.Maybe (fromJust, fromMaybe)
-import Data.Tuple (swap)
+import           Data.Maybe                         (fromJust, fromMaybe)
+import           Data.Tuple                         (swap)
 
 data IcmpType =
     IcmpEchoReply |

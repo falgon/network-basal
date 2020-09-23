@@ -4,5 +4,5 @@ module Network.Basal (
     module Network.Basal.Tools
 ) where
 
-import Network.Basal.Protocols
-import Network.Basal.Tools
+import           Network.Basal.Protocols
+import           Network.Basal.Tools

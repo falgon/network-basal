@@ -5,13 +5,14 @@ module Test.Subnet (
     test3
 ) where
 
-import qualified Test.TestUtils as TT
-import Network.Basal.Subnet (getSubnetMaskFromNIface, isin)
-import Network.Basal.Protocols.Utils (getDefaultNIface, findNIface, host2ipv4)
+import           Network.Basal.Protocols.Utils (findNIface, getDefaultNIface,
+                                                host2ipv4)
+import           Network.Basal.Subnet          (getSubnetMaskFromNIface, isin)
+import qualified Test.TestUtils                as TT
 
-import Data.Maybe (isJust)
-import Network.Info (name, IPv4(..), ipv4)
-import Test.HUnit ((@?=))
+import           Data.Maybe                    (isJust)
+import           Network.Info                  (IPv4 (..), ipv4, name)
+import           Test.HUnit                    ((@?=))
 
 testmodule :: String -> TT.Assertion -> TT.Test
 testmodule = TT.testmodule . (++) "Subnet."
@@ -28,7 +29,7 @@ test2int b src dst = (>>=) (findNIface src) $ maybe (return $ testmodule "test2 
         let (IPv4 ip) = ipv4 nic
             (IPv4 dstip) = target
         return $ testmodule "test2 isin: " $ maybe TT.fail ((@?=) b . isin ip dstip) =<< getSubnetMaskFromNIface (name nic)
-    
+
 
 test2 :: SrcNIC -> DstIp -> IO TT.Test
 test2 = test2int True

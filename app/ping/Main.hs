@@ -1,23 +1,23 @@
 {-# OPTIONS_GHC -Wall -Werror #-}
 module Main where
 
-import Prelude hiding (seq)
-import ExeUtils.Ping
+import           ExeUtils.Ping
+import           Prelude                         hiding (seq)
 
-import Network.Basal.Tools.Icmp.Inet (echo, ICMPResult)
 import qualified Network.Basal.Protocols.IP.Icmp as NI (socketINET)
-import Network.Basal.Protocols.Utils (setIpForward)
+import           Network.Basal.Protocols.Utils   (setIpForward)
+import           Network.Basal.Tools.Icmp.Inet   (ICMPResult, echo)
 
-import Control.Concurrent (threadDelay)
-import Control.Exception (bracket)
-import Control.Monad (forever, replicateM_, join)
-import Data.IORef
-import Data.Tuple.Extra (first, second)
-import Data.Maybe (maybe)
-import Network.Socket (close, Socket)
-import System.Exit (exitFailure)
-import System.Timeout (timeout)
-import System.Posix.Process (getProcessID)
+import           Control.Concurrent              (threadDelay)
+import           Control.Exception               (bracket)
+import           Control.Monad                   (forever, join, replicateM_)
+import           Data.IORef
+import           Data.Maybe                      (maybe)
+import           Data.Tuple.Extra                (first, second)
+import           Network.Socket                  (Socket, close)
+import           System.Exit                     (exitFailure)
+import           System.Posix.Process            (getProcessID)
+import           System.Timeout                  (timeout)
 
 makePings :: (ICMPResult -> IO ()) -> IORef (Int, Int) -> (Int, Int, Int, String) -> Socket -> IO ()
 makePings f ref (c, t, i, h) sock = do
@@ -31,6 +31,6 @@ makePings f ref (c, t, i, h) sock = do
 
 main :: IO ()
 main = bracket (setIpForward False) setIpForward $ \_ -> do
-    ref <- newIORef (0, 0) 
-    (>>=) parseArgs $ maybe exitFailure $ bracket NI.socketINET close . makePings disping ref 
+    ref <- newIORef (0, 0)
+    (>>=) parseArgs $ maybe exitFailure $ bracket NI.socketINET close . makePings disping ref
     readIORef ref >>= pingResult

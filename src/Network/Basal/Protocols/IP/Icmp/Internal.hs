@@ -13,23 +13,28 @@ module Network.Basal.Protocols.IP.Icmp.Internal (
     ethPacket
 ) where
 
-import Network.Basal.Protocols.IP.Icmp.Identifiers
-import qualified Network.Basal.Tools.Ether as TE
-import qualified Network.Basal.Protocols.Link.Ether as LE
-import qualified Network.Basal.Protocols.IP.Identifiers as II
-import qualified Network.Basal.Protocols.IP.Internal as II
+import           Network.Basal.Protocols.IP.Icmp.Identifiers
+import qualified Network.Basal.Protocols.IP.Identifiers      as II
+import qualified Network.Basal.Protocols.IP.Internal         as II
+import qualified Network.Basal.Protocols.Link.Ether          as LE
+import qualified Network.Basal.Tools.Ether                   as TE
 
-import qualified Data.Binary.Get as BG
-import qualified Data.Binary.Put as BP
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BL
-import Data.Tuple.Extra (second, dupe)
-import Data.Int (Int64)
-import Data.Word (Word8, Word16)
-import Network.Pcap (PcapHandle, setFilter, openLive)
-import qualified Network.Socket as NS hiding (recv, recvFrom, send, sendTo)
-import Network.Socket.ByteString as SB
-import qualified Network.Info as NI
+import qualified Data.Binary.Get                             as BG
+import qualified Data.Binary.Put                             as BP
+import qualified Data.ByteString                             as BS
+import qualified Data.ByteString.Lazy                        as BL
+import           Data.Int                                    (Int64)
+import           Data.Tuple.Extra                            (dupe, second)
+import           Data.Word                                   (Word16, Word8)
+import qualified Network.Info                                as NI
+import           Network.Pcap                                (PcapHandle,
+                                                              openLive,
+                                                              setFilter)
+import qualified Network.Socket                              as NS hiding (recv,
+                                                                    recvFrom,
+                                                                    send,
+                                                                    sendTo)
+import           Network.Socket.ByteString                   as SB
 
 recvMax :: Int
 recvMax = 2048
@@ -38,15 +43,15 @@ icmpLength :: Word16
 icmpLength = 20
 
 data Header = Header {
-    icmpType :: IcmpType,
-    icmpCode :: Word8,
+    icmpType     :: IcmpType,
+    icmpCode     :: Word8,
     icmpChecksum :: Word16,
-    icmpIdent :: Word16,
-    icmpSeq :: Word16
+    icmpIdent    :: Word16,
+    icmpSeq      :: Word16
 } deriving Show
 
 data Structure = Structure {
-    icmpH :: Header,
+    icmpH    :: Header,
     icmpData :: BL.ByteString
 } deriving Show
 
@@ -94,6 +99,6 @@ ipPacket st nic (NS.SockAddrInet _ addr) = II.ipHeader (II.IpProtocolInfo icmpLe
 ipPacket _ _ _ = error "sorry, implemented only ipv4 yet."
 
 ethPacket :: Structure -> NI.NetworkInterface -> NS.SockAddr -> IO (Maybe BL.ByteString)
-ethPacket st nic (NS.SockAddrInet p addr) = (>>=) (TE.getDstMacAddr nic $ NS.SockAddrInet p addr) $ maybe (return Nothing) $ \dstm -> 
+ethPacket st nic (NS.SockAddrInet p addr) = (>>=) (TE.getDstMacAddr nic $ NS.SockAddrInet p addr) $ maybe (return Nothing) $ \dstm ->
     return $ Just $ II.etherHeader dstm nic <> ipPacket st nic (NS.SockAddrInet p addr)
 ethPacket _ _ _ = error "sorry, implemented only ipv4 yet."

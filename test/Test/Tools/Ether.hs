@@ -8,16 +8,16 @@ module Test.Tools.Ether (
     getDstMacAddrWhenFailedErr
 ) where
 
-import qualified Test.Tools.TestUtils as TT
-import qualified Network.Basal.Protocols.Utils as PU
 import qualified Network.Basal.Protocols.IP.Internal as IP
-import qualified Network.Basal.Tools.Ether as TE 
-import qualified Network.Basal.Tools.Arp as ARP
+import qualified Network.Basal.Protocols.Utils       as PU
+import qualified Network.Basal.Tools.Arp             as ARP
+import qualified Network.Basal.Tools.Ether           as TE
+import qualified Test.Tools.TestUtils                as TT
 
-import Data.Int (Int64)
-import qualified Network.Info as NI
-import qualified Network.Socket as NS
-import Test.HUnit ((@?=))
+import           Data.Int                            (Int64)
+import qualified Network.Info                        as NI
+import qualified Network.Socket                      as NS
+import           Test.HUnit                          ((@?=))
 
 testmodule :: String -> TT.Assertion -> TT.Test
 testmodule = TT.testmodule . (++) "Ether."
@@ -35,7 +35,7 @@ getarperr :: (String -> TT.Assertion -> TT.Test) -> String -> TT.Test
 getarperr tmod s = tmod (s ++ ".getMacAddr: failed to get the MAC address from specified ip address.") TT.fail
 
 getdgwerr :: String -> TT.Test
-getdgwerr = flip testmodule TT.fail . 
+getdgwerr = flip testmodule TT.fail .
     flip (++) ".getDGWMacAddr: failed to get the MAC address of the specified default gateway."
 
 getdstmacaddrerr :: (String -> TT.Assertion -> TT.Test) -> String -> TT.Test
@@ -51,12 +51,12 @@ getDstMacAddrWhenFailedErr :: (String -> TT.Assertion -> TT.Test) -> String -> N
 getDstMacAddrWhenFailedErr tmod s iface dstip = (>>=) (PU.host2addr dstip >>= TE.getDstMacAddr iface) . maybe (return $ getdstmacaddrerr tmod s)
 
 getDstMacAddrSameSubnet :: IfaceName -> DstIp -> IO TT.Test
-getDstMacAddrSameSubnet iface dst = findNIfaceWhenFailedErr testmodule "getDstMacAddrSameSubnet: " iface $ \nic -> 
-    getMacAddrWhenFailedErr testmodule "getDstMacAddrSameSubnet: " nic dst timeout $ \dstm -> 
+getDstMacAddrSameSubnet iface dst = findNIfaceWhenFailedErr testmodule "getDstMacAddrSameSubnet: " iface $ \nic ->
+    getMacAddrWhenFailedErr testmodule "getDstMacAddrSameSubnet: " nic dst timeout $ \dstm ->
         getDstMacAddrWhenFailedErr testmodule "getDstMacAddrSameSubnet: " nic dst $ return . testmodule "getDstMacAddr: " . (@?=) dstm
 
 getDstMacAddrDiffSubnet :: IfaceName -> DstIp -> IO TT.Test
 getDstMacAddrDiffSubnet iface dst = findNIfaceWhenFailedErr testmodule "getDstMacAddrDiffSubnet: " iface $ \nic ->
     (>>=) (IP.getDGWMacAddr nic timeout) $ maybe (return $ getdgwerr "getDstMacAddrDiffSubnet: ") $ \dgw ->
         getDstMacAddrWhenFailedErr testmodule "getDstMacAddrDiffSubnet: " nic dst $ return . testmodule "getDstMacAddr: " . (@?=) dgw
-        
+

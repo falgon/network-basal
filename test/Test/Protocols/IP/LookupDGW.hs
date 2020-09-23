@@ -4,13 +4,13 @@ module Test.Protocols.IP.LookupDGW (
     test2
 ) where
 
-import Network.Basal.Protocols.IP.Internal (lookupDGW)
+import           Network.Basal.Protocols.IP.Internal (lookupDGW)
 
-import Data.List (find)
-import Data.Maybe (maybe, isJust)
-import Test.HUnit (Test, (~:), (@?=))
-import System.Process (readProcess)
-import Network.Info (IPv4 (..))
+import           Data.List                           (find)
+import           Data.Maybe                          (isJust, maybe)
+import           Network.Info                        (IPv4 (..))
+import           System.Process                      (readProcess)
+import           Test.HUnit                          (Test, (@?=), (~:))
 
 test1 :: IO Test
 test1 = (~:) "Test.Protocols.IP.LookupDGW.test1: " . (@?=) True . isJust <$> lookupDGW

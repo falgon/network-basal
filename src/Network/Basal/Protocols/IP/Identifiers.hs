@@ -10,18 +10,19 @@ module Network.Basal.Protocols.IP.Identifiers (
     defTTL
 ) where
 
-import Network.Basal.Protocols.Utils (toEnumError, succError, predError, int2Hex)
-import Network.Basal.Protocols.Link.Ether (Parameter)
+import           Network.Basal.Protocols.Link.Ether (Parameter)
+import           Network.Basal.Protocols.Utils      (int2Hex, predError,
+                                                     succError, toEnumError)
 
-import Data.Bits ((.&.))
-import Data.Word (Word8, Word16)
-import Data.Maybe (fromJust, fromMaybe)
-import Data.Tuple (swap)
+import           Data.Bits                          ((.&.))
+import           Data.Maybe                         (fromJust, fromMaybe)
+import           Data.Tuple                         (swap)
+import           Data.Word                          (Word16, Word8)
 
--- | The value is 5 because the data length of the ip header is specified in units of 4 bytes and 
+-- | The value is 5 because the data length of the ip header is specified in units of 4 bytes and
 -- when the packet does not have options, its size is 20 bytes.
 noOptHeaderLength :: Word8
-noOptHeaderLength = 5 
+noOptHeaderLength = 5
 
 data ServiceType = TosLowDelay | TosThroughPut | TosReliability | TosLowcost deriving (Eq, Ord, Show, Read)
 
@@ -44,11 +45,11 @@ fragTable = [
     (MoreFragment, 0x2000)]
 
 instance Enum Frag where
-    succ Reserved = NotFragment
-    succ NotFragment = MoreFragment
+    succ Reserved     = NotFragment
+    succ NotFragment  = MoreFragment
     succ MoreFragment = succError "Frag"
-    pred Reserved = predError "Frag"
-    pred NotFragment = Reserved
+    pred Reserved     = predError "Frag"
+    pred NotFragment  = Reserved
     pred MoreFragment = NotFragment
     fromEnum = fromJust . flip lookup fragTable
     toEnum i = fromMaybe (toEnumError "Frag" i (minBound :: Frag, maxBound :: Frag)) $ lookup i (map swap fragTable)
@@ -64,7 +65,7 @@ maxTTL = 255
 defTTL :: Word8
 defTTL = 64
 
-data ProtocolNum = 
+data ProtocolNum =
     Dummy           |
     Hopopts         |
     Icmp            |

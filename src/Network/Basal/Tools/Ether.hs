@@ -2,15 +2,15 @@ module Network.Basal.Tools.Ether (
     getDstMacAddr
 ) where
 
-import Network.Basal.Subnet
-import qualified Network.Basal.Protocols.IP.Internal as IP 
-import qualified Network.Basal.Tools.Arp as ARP
+import qualified Network.Basal.Protocols.IP.Internal as IP
+import           Network.Basal.Subnet
+import qualified Network.Basal.Tools.Arp             as ARP
 
-import qualified Network.Socket as NS
-import qualified Network.Info as NI
+import qualified Network.Info                        as NI
+import qualified Network.Socket                      as NS
 
--- | Let X be the specified ip address. 
--- If X is included in the subnet to which the specified nic belongs, 
+-- | Let X be the specified ip address.
+-- If X is included in the subnet to which the specified nic belongs,
 -- it will obtain the MAC address of X (possibly by issuing an ARP request),
 -- otherwise it will return the MAC address of the default route gateway.
 getDstMacAddr :: NI.NetworkInterface -> NS.SockAddr -> IO (Maybe NI.MAC)

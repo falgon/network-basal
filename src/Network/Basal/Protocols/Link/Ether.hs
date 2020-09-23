@@ -29,19 +29,21 @@ module Network.Basal.Protocols.Link.Ether (
     paramVal
 ) where
 
-import Network.Basal.Protocols.Utils (succError, predError, toEnumError, int2Hex, l2m)
+import           Network.Basal.Protocols.Utils (int2Hex, l2m, predError,
+                                                succError, toEnumError)
 
-import Control.Monad (replicateM)
-import Control.Monad.Fix (fix)
-import qualified Data.Binary.Get as BG
-import qualified Data.Binary.Put as BP
-import qualified Data.ByteString as B
-import qualified Data.ByteString as BS (ByteString, splitAt)
-import qualified Data.ByteString.Lazy as BL (ByteString, fromStrict)
-import Data.Maybe (fromJust, fromMaybe)
-import Data.Tuple (swap)
-import Data.Word (Word8)
-import Network.Pcap (PktHdr, sendPacketBS, PcapHandle, nextBS)
+import           Control.Monad                 (replicateM)
+import           Control.Monad.Fix             (fix)
+import qualified Data.Binary.Get               as BG
+import qualified Data.Binary.Put               as BP
+import qualified Data.ByteString               as B
+import qualified Data.ByteString               as BS (ByteString, splitAt)
+import qualified Data.ByteString.Lazy          as BL (ByteString, fromStrict)
+import           Data.Maybe                    (fromJust, fromMaybe)
+import           Data.Tuple                    (swap)
+import           Data.Word                     (Word8)
+import           Network.Pcap                  (PcapHandle, PktHdr, nextBS,
+                                                sendPacketBS)
 
 ethAlen :: Word8
 ethAlen = 6
@@ -84,28 +86,28 @@ table = [
     (EthLoopBack, 0x9000)]
 
 instance Enum EtherType where
-    succ EthPup = EthSprite
-    succ EthSprite = EthIP
-    succ EthIP = EthArp
-    succ EthArp = EthRevArp
-    succ EthRevArp = EthAt
-    succ EthAt = EthAArp
-    succ EthAArp = EthVlan
-    succ EthVlan = EthIpx
-    succ EthIpx = EthIpv6
-    succ EthIpv6 = EthLoopBack
+    succ EthPup      = EthSprite
+    succ EthSprite   = EthIP
+    succ EthIP       = EthArp
+    succ EthArp      = EthRevArp
+    succ EthRevArp   = EthAt
+    succ EthAt       = EthAArp
+    succ EthAArp     = EthVlan
+    succ EthVlan     = EthIpx
+    succ EthIpx      = EthIpv6
+    succ EthIpv6     = EthLoopBack
     succ EthLoopBack = succError "EtherType"
-    
-    pred EthPup = predError "EtherType"
-    pred EthSprite = EthPup
-    pred EthIP = EthSprite
-    pred EthArp = EthIP
-    pred EthRevArp = EthArp
-    pred EthAt = EthRevArp
-    pred EthAArp = EthAt
-    pred EthVlan = EthAArp
-    pred EthIpx = EthVlan
-    pred EthIpv6 = EthIpx
+
+    pred EthPup      = predError "EtherType"
+    pred EthSprite   = EthPup
+    pred EthIP       = EthSprite
+    pred EthArp      = EthIP
+    pred EthRevArp   = EthArp
+    pred EthAt       = EthRevArp
+    pred EthAArp     = EthAt
+    pred EthVlan     = EthAArp
+    pred EthIpx      = EthVlan
+    pred EthIpv6     = EthIpx
     pred EthLoopBack = EthIpv6
 
     fromEnum = fromJust . flip lookup table
@@ -120,7 +122,7 @@ class EtherData a where
 data Header = Header {
     ethDhost :: [Word8],
     ethShost :: [Word8],
-    ethType :: EtherType
+    ethType  :: EtherType
 }
 
 instance Show Header where
@@ -129,7 +131,7 @@ instance Show Header where
 
 data Structure a = Structure {
     ethHeader :: Header,
-    ethData :: a
+    ethData   :: a
 } deriving Show
 
 type Packet = B.ByteString

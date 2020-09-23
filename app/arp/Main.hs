@@ -1,10 +1,10 @@
 module Main where
 
+import           Data.Int                (Int64)
 import qualified Network.Basal.Tools.Arp as ARP
-import Data.Int (Int64)
-import System.Environment (getArgs, getProgName)
-import System.Exit (exitFailure)
-import System.IO (hPutStrLn, stderr)
+import           System.Environment      (getArgs, getProgName)
+import           System.Exit             (exitFailure)
+import           System.IO               (hPutStrLn, stderr)
 
 timeOuts :: Int64
 timeOuts = 5 * 1000 * 1000

@@ -4,17 +4,18 @@ module Network.Basal.Tools.Wol (
     sendTo
 ) where
 
-import Network.Basal.Protocols.Utils (host2addr)
+import           Network.Basal.Protocols.Utils (host2addr)
 
-import Control.Monad (void)
-import qualified Data.ByteString as B
-import Data.Bool (bool)
-import Data.List.Split (splitOn)
-import Data.Tuple.Extra (first, second, dupe)
-import Data.Word (Word8)
-import qualified Network.Socket as NS hiding (send, sendTo, recv, recvFrom)
-import qualified Network.Socket.ByteString as SB
-import Numeric (readHex)
+import           Control.Monad                 (void)
+import           Data.Bool                     (bool)
+import qualified Data.ByteString               as B
+import           Data.List.Split               (splitOn)
+import           Data.Tuple.Extra              (dupe, first, second)
+import           Data.Word                     (Word8)
+import qualified Network.Socket                as NS hiding (recv, recvFrom,
+                                                      send, sendTo)
+import qualified Network.Socket.ByteString     as SB
+import           Numeric                       (readHex)
 
 type MacAddr = String
 

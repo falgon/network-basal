@@ -24,16 +24,17 @@ module Network.Basal.Protocols.Utils (
     l2m
 ) where
 
-import Data.Char (digitToInt, intToDigit)
-import Data.Word (Word8)
-import Data.List (foldl', find, unfoldr)
-import Data.Tuple.Extra (first, second, dupe)
-import Data.Maybe (fromMaybe)
-import qualified Network.Info as NI
-import qualified Network.Socket as NS
-import System.IO (IOMode (ReadWriteMode), hGetChar, hPutChar, withFile)
-#ifdef __GLASGOW_HASKELL__ 
-import GHC.Enum (succError, predError, toEnumError)
+import           Data.Char        (digitToInt, intToDigit)
+import           Data.List        (find, foldl', unfoldr)
+import           Data.Maybe       (fromMaybe)
+import           Data.Tuple.Extra (dupe, first, second)
+import           Data.Word        (Word8)
+import qualified Network.Info     as NI
+import qualified Network.Socket   as NS
+import           System.IO        (IOMode (ReadWriteMode), hGetChar, hPutChar,
+                                   withFile)
+#ifdef __GLASGOW_HASKELL__
+import           GHC.Enum         (predError, succError, toEnumError)
 #else
 {-# NOINLINE succError #-}
 succError :: String -> a
@@ -69,7 +70,7 @@ int2Hex :: Integral a => a -> String
 int2Hex = map (intToDigit . fromIntegral) . reverse . unfoldr (\x -> if x == 0 then Nothing else Just (mod x 16, div x 16))
 
 hex2Int :: String -> Int
-hex2Int = foldl' (flip (.) digitToInt . (+) . (16*)) 0 
+hex2Int = foldl' (flip (.) digitToInt . (+) . (16*)) 0
 
 setIpForward :: Bool -> IO Bool
 setIpForward x = withFile "/proc/sys/net/ipv4/ip_forward" ReadWriteMode $ \h -> do
@@ -84,4 +85,4 @@ m2l (NI.MAC b1 b2 b3 b4 b5 b6) = [b1, b2, b3, b4, b5, b6]
 -- | [Word8] to Maybe NI.Mac
 l2m :: [Word8] -> Maybe NI.MAC
 l2m [b1, b2, b3, b4, b5, b6] = Just $ NI.MAC b1 b2 b3 b4 b5 b6
-l2m _ = Nothing
+l2m _                        = Nothing

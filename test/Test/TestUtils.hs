@@ -7,8 +7,8 @@ module Test.TestUtils (
     Test
 ) where
 
-import Prelude hiding (fail)
-import Test.HUnit (Assertion, Test, (@?=), (~:))
+import           Prelude    hiding (fail)
+import           Test.HUnit (Assertion, Test, (@?=), (~:))
 
 fail :: Assertion
 fail = True @?= False
